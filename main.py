@@ -1,4 +1,5 @@
 import xml.etree.ElementTree as ET
+import aspose.pdf as pdf
 
 
 def xml_to_tex(xml_filename, tex_filename):
@@ -35,7 +36,7 @@ def xml_to_tex(xml_filename, tex_filename):
 
         for child in table_children:
             for i, grandchild in enumerate(child):
-                tex_file.write(f'{grandchild.text}')
+                tex_file.write(f'{grandchild.text if grandchild.text is not None else "Empty record"}')
                 if i < len(child) - 1:
                     tex_file.write(' & ')
                 else:
@@ -52,9 +53,9 @@ def xml_to_tex(xml_filename, tex_filename):
         for child in list_children:
             temp = []
             for i, grandchild in enumerate(child):
-                temp.append(grandchild.text)
+                temp.append(grandchild.text if grandchild.text is not None else "Empty record")
             my_string = ', '.join(map(str, temp))
-            tex_file.write(f'\\item {my_string}\n')
+            tex_file.write(f'\\item \\textit{{{my_string}}}\n')
 
         tex_file.write('\\end{itemize}\n')
 
@@ -66,9 +67,9 @@ def xml_to_tex(xml_filename, tex_filename):
         for child in list_children:
             temp = []
             for i, grandchild in enumerate(child):
-                temp.append(grandchild.text)
+                temp.append(grandchild.text if grandchild.text is not None else "Empty record")
             my_string = ', '.join(map(str, temp))
-            tex_file.write(f'\\item {my_string}\n')
+            tex_file.write(f'\\item \\textbf{{{my_string}}}\n')
 
         tex_file.write('\\end{enumerate}\n')
 
@@ -77,5 +78,18 @@ def xml_to_tex(xml_filename, tex_filename):
     print("Successful conversion")
 
 
+def convert_xml_to_latex(path_infile, path_outfile):
+    options = pdf.TeXLoadOptions()
+
+    document = pdf.Document(path_infile, options)
+    document.save(path_outfile)
+    print("LaTeX to PDF Converted Successfully")
+
+
 if __name__ == "__main__":
-    xml_to_tex("data/SampleTest.xml", "output.tex")
+    xml_path = "data/input.xml"
+    latex_path = "data/output.tex"
+    pdf_path = "data/output.pdf"
+
+    xml_to_tex(xml_path, latex_path)
+    convert_xml_to_latex(latex_path, pdf_path)
